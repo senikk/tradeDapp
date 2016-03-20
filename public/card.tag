@@ -6,7 +6,7 @@
   			  <p>{opts.product.description}</p>	
         </div>
         <div class="card-action">
-			<button class="waves-effect waves-light btn"><i class="material-icons left">payment</i> PAY {opts.product.price} Lisk</button>
+			<button class="waves-effect waves-light btn"><i class="material-icons left">payment</i> {opts.product.price} L</button>
         </div>
       </div>
     </div>

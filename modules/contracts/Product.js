@@ -21,7 +21,7 @@ Product.prototype.create = function (data, trs) {
 }
 
 Product.prototype.calculateFee = function (trs) {
-    return 100000000;
+    return 0;
 }
 
 Product.prototype.verify = function (trs, sender, cb, scope) {
@@ -51,6 +51,9 @@ Product.prototype.undo = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
+    console.log("== APPLY UNCONFIRMED ==");
+    console.log(trs);
+
     if (sender.u_balance < trs.fee) {
         return setImmediate(cb, "Sender doesn't have enough coins");
     }
@@ -62,6 +65,9 @@ Product.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.undoUnconfirmed = function (trs, sender, cb, scope) {
+    console.log("== UNDO UNCONFIRMED ==");
+    console.log(trs);
+
     modules.blockchain.accounts.undoMerging({
         address: sender.address,
         u_balance: -trs.fee
@@ -73,6 +79,8 @@ Product.prototype.ready = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.save = function (trs, cb) {
+    console.log("== SAVE ==");
+    console.log(trs);
     modules.api.sql.insert({
         table: "asset_products",
         values: {
@@ -90,7 +98,7 @@ Product.prototype.dbRead = function (row) {
         return null;
     } else {
         return {
-            Product: row.p_products
+            title: row.p_title,
         };
     }
 }
@@ -145,6 +153,8 @@ Product.prototype.add = function (cb, query) {
     }, function (err) {
         // If error exists, execute callback with error as first argument
         if (err) {
+            console.log("== ERR1 ==");
+            console.log(err);
             return cb(err[0].message);
         }
 
@@ -154,6 +164,8 @@ Product.prototype.add = function (cb, query) {
         }, function (err, account) {
             // If error occurs, call cb with error argument
             if (err) {
+                console.log("== ERR2 ==");
+                console.log(err);
                 return cb(err);
             }
 
@@ -162,19 +174,18 @@ Product.prototype.add = function (cb, query) {
                     type: self.type,
                     title: query.title,
                     description: query.description,
-                    price: query.price,
-                    stockQuantity: query.stockQuantity,
+                    price: parseInt(query.price),
+                    stockQuantity: parseInt(query.stockQuantity),
                     recipientId: account.address,
                     sender: account,
                     keypair: keypair
                 });
             } catch (e) {
                 // Catch error if something goes wrong
+                console.log("== ERR3 ==");
+                console.log(e);
                 return setImmediate(cb, e.toString());
             }
-
-            console.log("==PROCESS IT")
-            console.log(transaction);
 
             // Send transaction for processing
             modules.blockchain.transactions.processUnconfirmedTransaction(transaction, cb);
@@ -205,9 +216,6 @@ Product.prototype.list = function (cb, query) {
             if (err) {
                 return cb(err.toString());
             }
-
-            console.log("===");
-            console.log(transactions);
 
             // Map results to asset object
             var products = transactions.map(function (tx) {
