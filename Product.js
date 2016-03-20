@@ -12,9 +12,8 @@ Product.prototype.create = function (data, trs) {
     trs.recipientId = data.recipientId;
     trs.asset = {
         title: data.title,
-        description: data.description,
-        price: data.price,
-        stockQuantity: data.stockQuantity
+        descripton: data.descripton,
+        price: data.price
     };
 
     return trs;
@@ -78,9 +77,8 @@ Product.prototype.save = function (trs, cb) {
         values: {
             transactionId: trs.id,
             title: trs.asset.title,
-            description: trs.asset.description,
-            price: trs.asset.price,
-            stockQuantity: trs.asset.stockQuantity
+            descripton: trs.asset.descripton,
+            price: trs.asset.price
         }
     }, cb);
 }
@@ -130,18 +128,18 @@ Product.prototype.add = function (cb, query) {
             title: {
                 type: "string",
                 minLength: 1,
-                maxLength: 100
+                maxLength: 160
             },
             price: {
                 type: "integer",
                 not_null: true
             },
             stockQuantity: {
-                type: "number",
+                type: "integer",
                 not_null: true
             }
         },
-        required: ["secret", "title", "price", "stockQuantity"]
+        required: ["secret", "title", "price"]
     }, function (err) {
         // If error exists, execute callback with error as first argument
         if (err) {
@@ -157,11 +155,13 @@ Product.prototype.add = function (cb, query) {
                 return cb(err);
             }
 
+            console.log("===MAKING TRANS===");
+         
             try {
                 var transaction = library.modules.logic.transaction.create({
                     type: self.type,
                     title: query.title,
-                    description: query.description,
+                    descripton: query.descripton,
                     price: query.price,
                     stockQuantity: query.stockQuantity,
                     recipientId: account.address,
@@ -170,11 +170,10 @@ Product.prototype.add = function (cb, query) {
                 });
             } catch (e) {
                 // Catch error if something goes wrong
+                console.log("===ERRROR LAST====");
+                console.log(e.toString());
                 return setImmediate(cb, e.toString());
             }
-
-            console.log("==PROCESS IT")
-            console.log(transaction);
 
             // Send transaction for processing
             modules.blockchain.transactions.processUnconfirmedTransaction(transaction, cb);
@@ -184,8 +183,6 @@ Product.prototype.add = function (cb, query) {
 
 Product.prototype.list = function (cb, query) {
         // Select from transactions table and join Products from the asset_Products table
-        console.log("==LIST CALLED==");
-
         modules.api.sql.select({
             table: "transactions",
             alias: "t",
@@ -201,29 +198,25 @@ Product.prototype.list = function (cb, query) {
             sort: {
                 timestamp: -1
             }
-        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 'transactionId', 'title', 'description', 'price', 'stockQuantity'], function (err, transactions) {
+        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 'transactionId', 'title', 'descripton', 'price', 'stockQuantity'], function (err, transactions) {
             if (err) {
                 return cb(err.toString());
             }
 
-            console.log("===");
-            console.log(transactions);
-
             // Map results to asset object
-            var products = transactions.map(function (tx) {
-                var product = {
-                    id: tx.transactionId,
+            var Products = transactions.map(function (tx) {
+                tx.asset = {
                     title: tx.title,
-                    description: tx.description,
-                    price: tx.price,
-                    stockQuantity: tx.stockQuantity
+                    descripton: tx.descripton,
+                    price: tx.price
                 };
 
-                return product;
+                delete tx.Product;
+                return tx;
             });
 
             return cb(null, {
-                products: products
+                Products: Products
             })
         });
 }

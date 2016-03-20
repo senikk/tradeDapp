@@ -5,6 +5,16 @@
 		"handler": "system.api.helloworld"
 	},
 	{
+    	"path": "/products/add",
+    	"method": "post",
+    	"handler": "contracts.Product.add"
+	},
+	{
+    	"path": "/products/list",
+    	"method": "get",
+    	"handler" : "contracts.Product.list"
+	},
+	{
 		"path": "/message",
 		"method": "post",
 		"handler": "system.api.message"

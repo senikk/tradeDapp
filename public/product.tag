@@ -3,17 +3,13 @@
 
 	<ul class="collection with-header">
     	<li class="collection-item">
-            <label>Title</label>
-            <input name="title" />
+            <input name="title" placeholder="Title" />
+            <input name="description" placeholder="Description" />
+            <label>Price</label>
+            <input name="price" placeholder="Price in Lisk" />
+            <label># items</label>
+            <input name="stockQuantity" placeholder="Number of items for sale" />
         </li>
-    	<li class="collection-item">
-            <label>Description</label>
-            <input name="description" />
-        </li>        
-    	<li class="collection-item">
-            <label>Price in Lisk</label>
-            <input name="price" />
-        </li>        
         <li class="collection-item">
             <button onclick={add} class="waves-effect waves-light btn "><i class="material-icons left">done</i>Add product</button>
       	</li>
@@ -22,17 +18,25 @@
 	<script>
  		var self = this;
         this.mixin("Helper");
+        self.stockQuantity.value = 1;
 
         add(e) {
             this.api.post('/products/add', {
                 title: self.title.value,
                 description: self.description.value,
                 price: parseInt(self.price.value),
-                stockQuantity: 0,
+                stockQuantity: parseInt(self.stockQuantity.value),
                 secret: "senikk"
             }).then(function(response) {
                 console.log("==OK==")
                 console.log(response.data);
+
+                self.title.value = "";
+                self.description.value = "";
+                self.price.value = "";
+                self.stockQuantity = 1;
+                riot.route("/");
+
             }).catch(function(response) {
                 console.log("==Error==");
                 console.log(response);
