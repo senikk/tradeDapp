@@ -1,0 +1,9 @@
+.product .card-content {
+	min-height: 160px;
+}
+
+.product h1 {
+	font-size: 1.8em;
+	margin: 0;
+	padding: 0;
+}
