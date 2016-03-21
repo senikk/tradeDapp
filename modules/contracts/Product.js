@@ -25,7 +25,7 @@ Product.prototype.calculateFee = function (trs) {
 }
 
 Product.prototype.verify = function (trs, sender, cb, scope) {
-    if (trs.asset.title.length > 100) {
+    if (trs.asset.title.length > 200) {
         return setImmediate(cb, "Max length of product title is 100 chars");
     }
 

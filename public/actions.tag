@@ -8,7 +8,7 @@
 		  		<i class="medium material-icons">list</i>
 			</a>
 			<a class="btn-floating btn-medium" href="#/product">
-		  		<i class="medium material-icons">mode_edit</i>
+		  		<i class="medium material-icons">library_add</i>
 			</a>
 	  	</div>
     </div>
