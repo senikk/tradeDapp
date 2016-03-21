@@ -32,10 +32,12 @@
 			}
 		],
 		"foreignKeys": [
-			"field": "transactionId",
-			"table": "transactions",
-			"table_field": "id",
-			"on_delete": "cascade"
+			{
+				"field": "transactionId",
+				"table": "transactions",
+				"table_field": "id",
+				"on_delete": "cascade"
+			}
 		]
 	},
 	{
@@ -95,10 +97,12 @@
 			}
 		],
 		"foreignKeys": [
-			"field": "transactionId",
-			"table": "transactions",
-			"table_field": "id",
-			"on_delete": "cascade"
+			{
+				"field": "transactionId",
+				"table": "transactions",
+				"table_field": "id",
+				"on_delete": "cascade"
+			}
 		]
 	},
 	{
