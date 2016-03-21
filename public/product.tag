@@ -34,7 +34,7 @@
                 self.title.value = "";
                 self.description.value = "";
                 self.price.value = "";
-                self.stockQuantity = 1;
+                self.stockQuantity.value = 1;
                 riot.route("/");
 
             }).catch(function(response) {

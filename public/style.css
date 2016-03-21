@@ -2,8 +2,13 @@
 	min-height: 160px;
 }
 
-.product h1 {
-	font-size: 1.8em;
+h1.card-title {
+	font-size: 1em;
 	margin: 0;
 	padding: 0;
+}
+
+.product p {
+	color: white;
+	font-size: 0.8em;
 }

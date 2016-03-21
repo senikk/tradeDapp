@@ -11,9 +11,9 @@ function Product(cb, _library) {
 Product.prototype.create = function (data, trs) {
     trs.recipientId = data.recipientId;
     trs.asset = {
-        title: new Buffer(data.title, 'utf8').toString('hex'),
-        description: new Buffer(data.description, 'utf8').toString('hex'),
-        price: new Buffer(data.price),
+        title: data.title,
+        description: data.description,
+        price: data.price,
         stockQuantity: data.stockQuantity
     };
 
@@ -25,21 +25,18 @@ Product.prototype.calculateFee = function (trs) {
 }
 
 Product.prototype.verify = function (trs, sender, cb, scope) {
-    if (trs.asset.title.length > 100) {
-        return setImmediate(cb, "Max length of product title is 100 chars");
-    }
-
     setImmediate(cb, null, trs);
 }
 
 Product.prototype.getBytes = function (trs) {
+    console.log("==getBytes");
+    console.log(trs);
     var b = Buffer.concat([
         new Buffer(trs.asset.title, 'hex'),
         new Buffer(trs.asset.description, 'hex')
     ]);
 
     return b;
-    //return new Buffer(trs.asset.title + trs.asset.title, 'hex');
 }
 
 Product.prototype.apply = function (trs, sender, cb, scope) {
@@ -71,9 +68,6 @@ Product.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.undoUnconfirmed = function (trs, sender, cb, scope) {
-    console.log("== UNDO UNCONFIRMED ==");
-    console.log(trs);
-
     modules.blockchain.accounts.undoMerging({
         address: sender.address,
         u_balance: -trs.fee
@@ -105,7 +99,7 @@ Product.prototype.dbRead = function (row) {
     } else {
         return {
             title: row.p_title,
-            description: row.p_description
+            description: row.p_description,
         };
     }
 }
@@ -116,12 +110,10 @@ Product.prototype.normalize = function (asset, cb) {
         properties: {
             title: {
                 type: "string",
-                format: "hex"
                 minLength: 1,
             },
             description: {
                 type: "string",
-                format: "hex",
                 minLength: 1
             }
         },
@@ -233,8 +225,8 @@ Product.prototype.list = function (cb, query) {
             var products = transactions.map(function (tx) {
                 var product = {
                     id: tx.transactionId,
-                    title: new Buffer(tx.title, 'hex').toString('utf8'),
-                    description: new Buffer(tx.description, 'hex').toString('utf8'),
+                    title: tx.title,
+                    description: tx.description,
                     price: tx.price,
                     stockQuantity: tx.stockQuantity
                 };

@@ -9,9 +9,13 @@
     this.on("before-mount", function () {
       this.api.get('/products/list')
         .then(function (response) {
-          console.log(response.data.response.products);
-          self.products = response.data.response.products;
-          self.update();
+          console.log("RESPONSE OK");
+          console.log(response.data.success);
+          if (response.data.success) {
+            self.products = response.data.response.products;
+            console.log(self.products);
+            self.update();
+          }
         });
     });
 	</script>
