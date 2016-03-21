@@ -30,6 +30,12 @@
 				"type": "BigInt",
 				"not_null": true
 			}
+		],
+		"foreignKeys": [
+			"field": "transactionId",
+			"table": "transactions",
+			"table_field": "id",
+			"on_delete": "cascade"
 		]
 	},
 	{
@@ -87,6 +93,12 @@
 				"type": "String",
 				"length": 20
 			}
+		],
+		"foreignKeys": [
+			"field": "transactionId",
+			"table": "transactions",
+			"table_field": "id",
+			"on_delete": "cascade"
 		]
 	},
 	{

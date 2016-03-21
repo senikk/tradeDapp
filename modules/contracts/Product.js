@@ -11,9 +11,9 @@ function Product(cb, _library) {
 Product.prototype.create = function (data, trs) {
     trs.recipientId = data.recipientId;
     trs.asset = {
-        title: data.title,
-        description: data.description,
-        price: data.price,
+        title: new Buffer(data.title, 'utf8').toString('hex'),
+        description: new Buffer(data.description, 'utf8').toString('hex'),
+        price: new Buffer(data.price),
         stockQuantity: data.stockQuantity
     };
 
@@ -25,7 +25,7 @@ Product.prototype.calculateFee = function (trs) {
 }
 
 Product.prototype.verify = function (trs, sender, cb, scope) {
-    if (trs.asset.title.length > 200) {
+    if (trs.asset.title.length > 100) {
         return setImmediate(cb, "Max length of product title is 100 chars");
     }
 
@@ -33,7 +33,13 @@ Product.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.getBytes = function (trs) {
-    return new Buffer(trs.asset.title + trs.asset.title, 'hex');
+    var b = Buffer.concat([
+        new Buffer(trs.asset.title, 'hex'),
+        new Buffer(trs.asset.description, 'hex')
+    ]);
+
+    return b;
+    //return new Buffer(trs.asset.title + trs.asset.title, 'hex');
 }
 
 Product.prototype.apply = function (trs, sender, cb, scope) {
@@ -99,6 +105,7 @@ Product.prototype.dbRead = function (row) {
     } else {
         return {
             title: row.p_title,
+            description: row.p_description
         };
     }
 }
@@ -109,11 +116,16 @@ Product.prototype.normalize = function (asset, cb) {
         properties: {
             title: {
                 type: "string",
+                format: "hex"
                 minLength: 1,
-                maxLength: 100
+            },
+            description: {
+                type: "string",
+                format: "hex",
+                minLength: 1
             }
         },
-        required: ["title"]
+        required: ["title","description"]
     }, cb);
 }
 
@@ -221,8 +233,8 @@ Product.prototype.list = function (cb, query) {
             var products = transactions.map(function (tx) {
                 var product = {
                     id: tx.transactionId,
-                    title: tx.title,
-                    description: tx.description,
+                    title: new Buffer(tx.title, 'hex').toString('utf8'),
+                    description: new Buffer(tx.description, 'hex').toString('utf8'),
                     price: tx.price,
                     stockQuantity: tx.stockQuantity
                 };
