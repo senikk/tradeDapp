@@ -22,3 +22,15 @@ body {
 .address {
 	font-size: 0.7em;
 }
+
+.description {
+	font-size: 0.7em;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+    display: block;
+    overflow: hidden
+}
+
+.lisk {
+	font-weight: bold;
+}

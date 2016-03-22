@@ -385,7 +385,7 @@ Order.prototype.list = function (cb, query) {
                     product: {
                         title: tx.title,
                         description: tx.description,
-                        amount: tx.amount
+                        price: tx.amount
                     }
                 };
 
