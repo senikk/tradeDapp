@@ -4,7 +4,7 @@
             <i class="material-icons left">perm_identity</i> Delivery address (<span class="required">* required</span>)
         </li>
     	<li class="collection-item">
-            <input name="fullname" placeholder="Full name" onchange={fullnameChange} />
+            <input name="fullname" placeholder="Full name" onchange={fullnameChange}/>
             <input name="addressLine1" placeholder="Address Line 1" onchange={addressLine1Change}/>
             <input name="addressLine2" placeholder="Addres Line 2" onchange={addressLine2Change}/>
             <input class="col s6" name="postalCode" placeholder="ZIP/Postal Code" onchange={postalCodeChange}/>
@@ -17,8 +17,6 @@
     <script>
         var self = this;
         this.mixin("Helper");
-
-        this.fullname.value = this.address.fullname;
 
         fullnameChange() {
             this.address.fullname = this.fullname.value;

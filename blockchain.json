@@ -52,7 +52,7 @@
     		},
     		{
     			"name": "productId",
-    			"type": "BigInt",
+    			"type": "String",
     			"length": 21
     		},
     		{

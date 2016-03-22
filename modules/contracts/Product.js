@@ -54,7 +54,7 @@ Product.prototype.undo = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
-    console.log("== APPLY UNCONFIRMED ==");
+    console.log("=P= APPLY UNCONFIRMED ==");
     console.log(trs);
 
     if (sender.u_balance < trs.fee) {
@@ -79,7 +79,7 @@ Product.prototype.ready = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.save = function (trs, cb) {
-    console.log("== SAVE ==");
+    console.log("=P= SAVE ==");
     console.log(trs);
     modules.api.sql.insert({
         table: "asset_products",
