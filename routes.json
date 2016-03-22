@@ -1,10 +1,5 @@
 [
 	{
-		"path": "/",
-		"method": "get",
-		"handler": "system.api.helloworld"
-	},
-	{
     	"path": "/products/add",
     	"method": "post",
     	"handler": "contracts.Product.add"
@@ -13,6 +8,16 @@
     	"path": "/products/list",
     	"method": "get",
     	"handler" : "contracts.Product.list"
+	},
+	{
+    	"path": "/orders/add",
+    	"method": "post",
+    	"handler": "contracts.Order.add"
+	},
+	{
+    	"path": "/orders/list",
+    	"method": "get",
+    	"handler" : "contracts.Order.list"
 	},
 	{
 		"path": "/message",

@@ -1,10 +1,16 @@
+body {
+	font-family: Verdana, Arial;
+}
+
 .product .card-content {
 	min-height: 160px;
 }
 
-h1.card-title {
+.product h1 {
 	font-size: 1em;
-	margin: 0;
+	line-height: 1em !important;
+	margin-top: 0;
+	margin-bottom: 10px;
 	padding: 0;
 }
 

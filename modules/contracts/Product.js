@@ -29,7 +29,7 @@ Product.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.getBytes = function (trs) {
-    console.log("==getBytes");
+    console.log("=P=getBytes");
     console.log(trs);
     var b = Buffer.concat([
         new Buffer(trs.asset.title, 'hex'),

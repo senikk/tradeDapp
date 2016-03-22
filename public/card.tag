@@ -6,8 +6,28 @@
   			  <p>{opts.product.description}</p>	
         </div>
         <div class="card-action">
-			<button class="waves-effect waves-light btn"><i class="material-icons left">payment</i> {opts.product.price} L</button>
+			<button onclick={pay} class="waves-effect waves-light btn"><i class="material-icons left">payment</i> {opts.product.price} L</button>
         </div>
       </div>
     </div>
+
+    <script>
+        var self = this;
+        this.mixin("Helper");
+
+        pay(e) {
+            console.log("PAYIT MAKE AN ORDER");
+            this.api.post('/orders/add', {
+                productId: opts.product.id,
+                secret: "senikk",
+                address: this.address
+            }).then(function(response) {
+                console.log("=O=OK==")
+                console.log(response.data);
+            }).catch(function(response) {
+                console.log("=O=Error==");
+                console.log(response);
+            });
+        }
+    </script>
 </card>

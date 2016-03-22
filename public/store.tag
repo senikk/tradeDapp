@@ -13,13 +13,5 @@
 	<script>
  		var self = this;
         this.mixin("Helper");
-
-        send(e) {
-            this.api.put('/messages/add', {
-                recipientId: "12994786767195560727L",
-                message: self.message.value,
-                secret: "senikk" 
-            });
-        }
 	</script>
 </store>
