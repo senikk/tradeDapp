@@ -1,6 +1,7 @@
 <app>
 	<store if={ tag == 'store'}></store>
 	<product if={ tag == 'product'}></product>
+	<orders if={ tag == 'orders'}></orders>
 
 	<script>
 		var self = this;

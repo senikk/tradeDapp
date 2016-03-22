@@ -1,8 +1,8 @@
 var Helper = {
   api: axios.create({
-    baseURL: 'http://192.168.99.100:7000/api/dapps/4754919274057023019/api/'
+    baseURL: 'http://192.168.99.100:7000/api/dapps/11911635833721108503/api/'
   }),
-  address: { fullname: "Terje" }
+  address: { fullname: "Terje Pedersen" }
 };
 
 riot.mixin('Helper', Helper);

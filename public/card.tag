@@ -17,9 +17,10 @@
 
         pay(e) {
             console.log("PAYIT MAKE AN ORDER");
+
             this.api.post('/orders/add', {
                 productId: opts.product.id,
-                secret: "senikk",
+                secret: "senikk2",
                 address: this.address
             }).then(function(response) {
                 console.log("=O=OK==")

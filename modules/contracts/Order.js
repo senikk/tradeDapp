@@ -1,3 +1,5 @@
+var async = require('async');
+
 var private = {}, self = null,
 	library = null, modules = null;
 
@@ -15,15 +17,21 @@ function Order(cb, _library) {
 }
 
 Order.prototype.create = function (data, trs) {
+    console.log("=O= CREATE");
+    console.log(data);
+
+    trs.recipientId = data.recipientId;
+    trs.amount = 1;
     trs.asset = {
+        productId: data.productId,
         status: STATUS.CREATED,
         fullname: data.fullname,
         addressLine1: data.addressLine1,
-        addressLine2: data.addressLine2,
-        city: data.city,
-        region: data.region,
-        postalCode: data.postalCode,
-        country: data.country
+        addressLine2: data.addressLine2 || "",
+        city: data.city || "",
+        region: data.region || "",
+        postalCode: data.postalCode || "",
+        country: data.country || ""
     };
 
     return trs;
@@ -38,50 +46,100 @@ Order.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 Order.prototype.getBytes = function (trs) {
-    console.log("=O=getBytes");
-    console.log(trs);
     var b = Buffer.concat([
         new Buffer(trs.asset.fullname, 'hex'),
-        new Buffer(trs.asset.addressLine1, 'hex'),
-        new Buffer(trs.asset.addressLine2, 'hex')
+        new Buffer(trs.asset.addressLine1, 'hex')
     ]);
 
     return b;
 }
 
 Order.prototype.apply = function (trs, sender, cb, scope) {
-    modules.blockchain.accounts.mergeAccountAndGet({
-        address: sender.address,
-        balance: -trs.fee
-    }, cb);
+    var amount = trs.amount; // product.price..
+
+    if (sender.balance < amount) {
+        return setImmediate(cb, "Balance has no enough Lisk: " + trs.id);
+    }
+
+    async.series([
+        function (cb) {
+            modules.blockchain.accounts.mergeAccountAndGet({
+                address: sender.address,
+                balance: -amount
+            }, cb, scope);
+        },
+        function (cb) {
+            modules.blockchain.accounts.mergeAccountAndGet({
+                address: trs.recipientId,
+                balance: trs.amount
+            }, cb, scope);
+        }
+    ], cb);
 }
 
 Order.prototype.undo = function (trs, sender, cb, scope) {
-    modules.blockchain.accounts.undoMerging({
-        address: sender.address,
-        balance: -trs.fee
-    }, cb);
+    var amount = trs.amount; // product.price
+
+    async.series([
+        function (cb) {
+            modules.blockchain.accounts.undoMerging({
+                address: sender.address,
+                balance: -amount
+            }, cb, scope);
+        },
+        function (cb) {
+            modules.blockchain.accounts.undoMerging({
+                address: trs.recipientId,
+                balance: trs.amount
+            }, cb, scope);
+        }
+    ], cb);
 }
 
 Order.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
-    console.log("=O= APPLY UNCONFIRMED ==");
-    console.log(trs);
+    console.log("=O= applyUnconfirmed");
+    console.log(sender);
+    console.log(trs.amount);
 
-    if (sender.u_balance < trs.fee) {
+    var amount = trs.amount; //
+
+    if (sender.u_balance < amount) {
         return setImmediate(cb, "Sender doesn't have enough coins");
     }
 
-    modules.blockchain.accounts.mergeAccountAndGet({
-        address: sender.address,
-        u_balance: -trs.fee
-    }, cb);
+    async.series([
+        function (cb) {
+            modules.blockchain.accounts.mergeAccountAndGet({
+                address: sender.address,
+                u_balance: -amount
+            }, cb, scope);
+        },
+        function (cb) {
+            modules.blockchain.accounts.mergeAccountAndGet({
+                address: trs.recipientId,
+                u_balance: trs.amount
+            }, cb, scope);
+        }
+    ], cb);
 }
 
 Order.prototype.undoUnconfirmed = function (trs, sender, cb, scope) {
-    modules.blockchain.accounts.undoMerging({
-        address: sender.address,
-        u_balance: -trs.fee
-    }, cb);
+    var amount = trs.amount;
+
+    async.series([
+        function (cb) {
+            modules.blockchain.accounts.undoMerging({
+                address: sender.address,
+                u_balance: -amount
+            }, cb, scope);
+        },
+        function (cb) {
+            modules.blockchain.accounts.undoMerging({
+                address: trs.recipientId,
+                u_balance: trs.amount
+            }, cb, scope);
+        }
+    ], cb);
 }
 
 Order.prototype.ready = function (trs, sender, cb, scope) {
@@ -95,27 +153,31 @@ Order.prototype.save = function (trs, cb) {
         table: "asset_orders",
         values: {
             transactionId: trs.id,
-            productId: trs.productId,
+            productId: trs.asset.productId,
             status: STATUS.CREATED,
-        	fullname: trs.fullname,
-        	addressLine1: trs.addressLine1,
-        	addressLine2: trs.addressLine2,
-        	city: trs.city,
-        	region: trs.region,
-        	postalCode: trs.postalCode,
-        	country: trs.country
+        	fullname: trs.asset.fullname,
+        	addressLine1: trs.asset.addressLine1,
+        	addressLine2: trs.asset.addressLine2,
+        	city: trs.asset.city,
+        	region: trs.asset.region,
+        	postalCode: trs.asset.postalCode,
+        	country: trs.asset.country
         }
     }, cb);
 }
 
 Order.prototype.dbRead = function (row) {
-    if (!row.p_transactionId) {
+    if (!row.o_transactionId) {
         return null;
     } else {
         return {
-            fullname: row.p_fullname,
-            addressLine1: row.p_addressLine1,
-            addressLine2: row.p_addressLine2
+            fullname: row.o_fullname,
+            addressLine1: row.o_addressLine1,
+            addressLine2: row.o_addressLine2,
+            city: row.o_city,
+            region: row.o_region,
+            postalCode: row.o_postalCode,
+            country: row.o_country
         };
     }
 }
@@ -222,35 +284,58 @@ Order.prototype.add = function (cb, query) {
                 return cb(err);
             }
 
-            try {
-                var transaction = library.modules.logic.transaction.create({
-                    type: self.type,
-                    productId: query.productId,
-                    fullname: query.address.fullname,
-                    addressLine1: query.address.addressLine1,
-                    addressLine2: query.address.addressLine2,
-                    city: query.address.city,
-                    region: query.address.region,
-                    country: query.address.country,
-                    sender: account,
-                    keypair: keypair
-                });
-            } catch (e) {
-                // Catch error if something goes wrong
-                console.log("=O= ERR3 ==");
-                console.log(e);
-                return setImmediate(cb, e.toString());
-            }
+            // Find the seller
+            modules.api.sql.select({
+                table: "transactions",
+                alias: "t",
+                condition: {
+                    id: query.productId,
+                    type: 1
+                },
+                fields: ['senderPublicKey']
+            }, {senderPublicKey: String}, function (err, rows) {
+                if (err || rows.length == 0) {
+                    return cb(err? err.toString() : "Can't find product");
+                }
 
-            // Send transaction for processing
-            modules.blockchain.transactions.processUnconfirmedTransaction(transaction, cb);
+                modules.blockchain.accounts.getAccount({
+                    publicKey: rows[0].senderPublicKey
+                }, function (err, recipient) {
+                    if (err || !recipient) {
+                        return cb(err? err.toString() : "Can't find recipient");
+                    }
+
+                    try {
+                        var transaction = library.modules.logic.transaction.create({
+                            type: self.type,
+                            productId: query.productId,
+                            fullname: query.address.fullname,
+                            addressLine1: query.address.addressLine1,
+                            addressLine2: query.address.addressLine2 || "",
+                            city: query.address.city || "",
+                            region: query.address.region || "",
+                            country: query.address.country || "",
+                            recipientId: recipient.address,
+                            sender: account,
+                            keypair: keypair
+                        });
+                    } catch (e) {
+                        // Catch error if something goes wrong
+                        console.log("=O= ERR3 ==");
+                        console.log(e);
+                        return setImmediate(cb, e.toString());
+                    }
+
+                    modules.blockchain.transactions.processUnconfirmedTransaction(transaction, cb);
+                });
+            });
         });
     });
 }
 
 Order.prototype.list = function (cb, query) {
         // Select from transactions table and join Products from the asset_Products table
-        console.log("==LIST CALLED==");
+        console.log("=O=LIST CALLED==");
 
         modules.api.sql.select({
             table: "transactions",
@@ -263,16 +348,26 @@ Order.prototype.list = function (cb, query) {
                 table: 'asset_orders',
                 alias: "o",
                 on: {"t.id": "o.transactionId"}
+            },{
+                type: 'left outer',
+                table: 'asset_products',
+                alias: "p",
+                on: {"o.productId": "p.transactionId"}                
             }],
             sort: {
                 timestamp: -1,
                 status: -1
             }
-        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 'transactionId', 'productId', 'status', 'fullname', 'addressLine1', 'addressLine2', 'city', 'region', 'postalCode', 'country'], function (err, transactions) {
+        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 
+            'transactionId', 'productId', 'status', 'fullname', 'addressLine1', 'addressLine2', 'city', 'region', 'postalCode', 'country', 
+            'transactionIdP', 'title', 'description', 'price', 'stockQuantity'], 
+                function (err, transactions) {
             if (err) {
                 return cb(err.toString());
             }
 
+            console.log("=O= transactions");
+      
             // Map results to asset object
             var orders = transactions.map(function (tx) {
                 var order = {
@@ -288,9 +383,13 @@ Order.prototype.list = function (cb, query) {
 	                    country: tx.country                    	
                     },
                     product: {
-
+                        title: tx.title,
+                        description: tx.description,
+                        amount: tx.amount
                     }
                 };
+
+                console.log(order);
 
                 return order;
             });
