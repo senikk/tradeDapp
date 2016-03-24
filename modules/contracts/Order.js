@@ -17,8 +17,10 @@ function Order(cb, _library) {
 }
 
 Order.prototype.create = function (data, trs) {
+    console.log("== CREATE ==");
+    console.log(data);
     trs.recipientId = data.recipientId;
-    trs.amount = 1;
+    trs.amount = data.amount;
     trs.asset = {
         productId: data.productId,
         status: STATUS.CREATED,
@@ -279,11 +281,20 @@ Order.prototype.add = function (cb, query) {
                     id: query.productId,
                     type: 1
                 },
-                fields: ['senderPublicKey']
-            }, {senderPublicKey: String}, function (err, rows) {
+                join: [{
+                    type: 'left outer',
+                    table: 'asset_products',
+                    alias: "p",
+                    on: {"t.id": "p.transactionId"}
+                }],
+                fields: ['senderPublicKey', 'price']
+            }, {senderPublicKey: String, price: Number}, function (err, rows) {
                 if (err || rows.length == 0) {
                     return cb(err? err.toString() : "Can't find product");
                 }
+
+                console.log("== ROW ==");
+                console.log(rows[0]);
 
                 modules.blockchain.accounts.getAccount({
                     publicKey: rows[0].senderPublicKey
@@ -295,6 +306,7 @@ Order.prototype.add = function (cb, query) {
                     try {
                         var transaction = library.modules.logic.transaction.create({
                             type: self.type,
+                            amount: rows[0].price,
                             productId: query.productId,
                             fullname: query.address.fullname,
                             addressLine1: query.address.addressLine1,
