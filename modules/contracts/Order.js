@@ -318,70 +318,155 @@ Order.prototype.add = function (cb, query) {
     });
 }
 
-Order.prototype.list = function (cb, query) {
+Order.prototype.yours = function (cb, query) {
         // Select from transactions table and join Products from the asset_Products table
-        console.log("=O=LIST CALLED==");
-
-        modules.api.sql.select({
-            table: "transactions",
-            alias: "t",
-            condition: {
-                type: self.type
-            },
-            join: [{
-                type: 'left outer',
-                table: 'asset_orders',
-                alias: "o",
-                on: {"t.id": "o.transactionId"}
-            },{
-                type: 'left outer',
-                table: 'asset_products',
-                alias: "p",
-                on: {"o.productId": "p.transactionId"}                
-            }],
-            sort: {
-                timestamp: -1,
-                status: -1
-            }
-        }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 
-            'transactionId', 'productId', 'status', 'fullname', 'addressLine1', 'addressLine2', 'city', 'region', 'postalCode', 'country', 
-            'transactionIdP', 'title', 'description', 'price', 'stockQuantity'], 
-                function (err, transactions) {
+        console.log("=O=YOURS CALLED==");
+    
+        var keypair = modules.api.crypto.keypair(query.secret);
+        modules.blockchain.accounts.setAccountAndGet({
+            publicKey: keypair.publicKey.toString('hex')
+        }, function (err, account) {
+            // If error occurs, call cb with error argument
             if (err) {
-                return cb(err.toString());
+                return cb(err);
             }
 
-            console.log("=O= transactions");
-      
-            // Map results to asset object
-            var orders = transactions.map(function (tx) {
-                var order = {
-                    id: tx.transactionId,
-                    status: tx.status,
-                    address: {
-	                    fullname: tx.fullname,
-	                    addressLine1: tx.addressLine1,
-	                    addressLine2: tx.addressLine2,
-	                    city: tx.city,
-	                    region: tx.region,
-	                    postalCode: tx.postalCode,
-	                    country: tx.country                    	
-                    },
-                    product: {
-                        title: tx.title,
-                        description: tx.description,
-                        price: tx.amount
-                    }
-                };
+            modules.api.sql.select({
+                table: "transactions",
+                alias: "t",
+                condition: {
+                    type: self.type,
+                    senderId: account.address
+                },
+                join: [{
+                    type: 'left outer',
+                    table: 'asset_orders',
+                    alias: "o",
+                    on: {"t.id": "o.transactionId"}
+                },{
+                    type: 'left outer',
+                    table: 'asset_products',
+                    alias: "p",
+                    on: {"o.productId": "p.transactionId"}                
+                }],
+                sort: {
+                    timestamp: -1,
+                    status: -1
+                }
+            }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 
+                'transactionId', 'productId', 'status', 'fullname', 'addressLine1', 'addressLine2', 'city', 'region', 'postalCode', 'country', 
+                'transactionIdP', 'title', 'description', 'price', 'stockQuantity'], 
+                    function (err, transactions) {
+                if (err) {
+                    return cb(err.toString());
+                }
+          
+                // Map results to asset object
+                var orders = transactions.map(function (tx) {
+                    var order = {
+                        id: tx.transactionId,
+                        status: tx.status,
+                        address: {
+                            fullname: tx.fullname,
+                            addressLine1: tx.addressLine1,
+                            addressLine2: tx.addressLine2,
+                            city: tx.city,
+                            region: tx.region,
+                            postalCode: tx.postalCode,
+                            country: tx.country                     
+                        },
+                        product: {
+                            title: tx.title,
+                            description: tx.description,
+                            price: tx.amount
+                        }
+                    };
 
-                console.log(order);
+                    console.log(order);
 
-                return order;
+                    return order;
+                });
+
+                return cb(null, {
+                    orders: orders
+                })
             });
+        });
+}
 
-            return cb(null, {
-                orders: orders
-            })
+Order.prototype.incomming = function (cb, query) {
+        // Select from transactions table and join Products from the asset_Products table
+        console.log("=O=INCOMMING CALLED==");
+
+        var keypair = modules.api.crypto.keypair(query.secret);
+        modules.blockchain.accounts.setAccountAndGet({
+            publicKey: keypair.publicKey.toString('hex')
+        }, function (err, account) {
+            // If error occurs, call cb with error argument
+            if (err) {
+                return cb(err);
+            }
+
+            modules.api.sql.select({
+                table: "transactions",
+                alias: "t",
+                condition: {
+                    type: self.type,
+                    recipientId: account.address
+                },
+                join: [{
+                    type: 'left outer',
+                    table: 'asset_orders',
+                    alias: "o",
+                    on: {"t.id": "o.transactionId"}
+                },{
+                    type: 'left outer',
+                    table: 'asset_products',
+                    alias: "p",
+                    on: {"o.productId": "p.transactionId"}                
+                }],
+                sort: {
+                    timestamp: -1,
+                    status: -1
+                }
+            }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 
+                'transactionId', 'productId', 'status', 'fullname', 'addressLine1', 'addressLine2', 'city', 'region', 'postalCode', 'country', 
+                'transactionIdP', 'title', 'description', 'price', 'stockQuantity'], 
+                    function (err, transactions) {
+                if (err) {
+                    return cb(err.toString());
+                }
+          
+                // Map results to asset object
+                var orders = transactions.map(function (tx) {
+                    var order = {
+                        id: tx.transactionId,
+                        status: tx.status,
+                        address: {
+                            fullname: tx.fullname,
+                            addressLine1: tx.addressLine1,
+                            addressLine2: tx.addressLine2,
+                            city: tx.city,
+                            region: tx.region,
+                            postalCode: tx.postalCode,
+                            country: tx.country                     
+                        },
+                        product: {
+                            title: tx.title,
+                            description: tx.description,
+                            price: tx.amount
+                        }
+                    };
+
+                    console.log(order);
+
+                    return order;
+                });
+
+                return cb(null, {
+                    orders: orders
+                })
+            });
         });
 }
 

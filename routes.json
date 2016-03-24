@@ -15,9 +15,14 @@
     	"handler": "contracts.Order.add"
 	},
 	{
-    	"path": "/orders/list",
+    	"path": "/orders/yours",
     	"method": "get",
-    	"handler" : "contracts.Order.list"
+    	"handler" : "contracts.Order.yours"
+	},
+	{
+    	"path": "/orders/incomming",
+    	"method": "get",
+    	"handler" : "contracts.Order.incomming"
 	},
 	{
 		"path": "/message",

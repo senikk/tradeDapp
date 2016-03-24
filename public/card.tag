@@ -20,7 +20,7 @@
 
             this.api.post('/orders/add', {
                 productId: opts.product.id,
-                secret: "senikk2",
+                secret: "senikk",
                 address: this.address
             }).then(function(response) {
                 console.log("=O=OK==")

@@ -1,9 +1,7 @@
-<orders>
-  <actions title="Orders"></actions>
-
+<orderslist>
   <ul class="collection with-header">
-    <li class="collection-header"><h5>Your orders</h5></li>
-    <li each={ orders } class="collection-item">
+    <li class="collection-header"><h5>{opts.title}</h5></li>
+    <li each={ opts.orders } class="collection-item">
       <div class="row">
         <div class="col s5">
           <span class="title">
@@ -31,15 +29,9 @@
         </div>
       </div>
     </li>
-
-    <li class="collection-header"><h5>Incomming orders</h5></li>
   </ul>
 
   <script>
- 		var self = this;
- 		var orders = [];
-    this.mixin("Helper");
-
     var STATUS = [
       "CREATED",
       "SENT",
@@ -49,14 +41,35 @@
     statusText(status) {
       return STATUS[status];
     }
+  </script>
+</orderslist>
+
+<orders>
+  <actions title="Orders"></actions>
+
+  <orderslist title="Your orders" orders={yours}></orderslist>
+  <orderslist title="Incomming orders" orders={incomming}></orderslist>
+
+  <script>
+ 		var self = this;
+ 		var yours = [];
+    var incomming = [];
+    this.mixin("Helper");
 
     this.on("before-mount", function () {
-      this.api.get('/orders/list')
+      this.api.get('/orders/yours?secret=senikk2')
         .then(function (response) {
-          console.log("RESPONSE OK GETTING ORDERS");
-          console.log(response.data.success);
           if (response.data.success) {
-            self.orders = response.data.response.orders;
+            self.yours = response.data.response.orders;
+            console.log(self.orders);
+            self.update();
+          }
+        });
+
+      this.api.get('/orders/incomming?secret=senikk2')
+        .then(function (response) {
+          if (response.data.success) {
+            self.incomming = response.data.response.orders;
             console.log(self.orders);
             self.update();
           }
