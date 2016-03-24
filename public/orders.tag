@@ -22,7 +22,7 @@
             <p class="description">
               { product.description }
             </p>
-            <span class="lisk">{ product.price } LISK</span>   
+            <span class="lisk">{ product.price } Ⱡ</span>   
         </div>
         <div class="col s2">
             <div class="chip status right">

@@ -29,11 +29,9 @@ Product.prototype.verify = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.getBytes = function (trs) {
-    console.log("=P=getBytes");
-    console.log(trs);
     var b = Buffer.concat([
-        new Buffer(trs.asset.title, 'hex'),
-        new Buffer(trs.asset.description, 'hex')
+        new Buffer(trs.asset.title, 'utf8'),
+        new Buffer(trs.asset.description, 'utf8')
     ]);
 
     return b;
@@ -79,8 +77,6 @@ Product.prototype.ready = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.save = function (trs, cb) {
-    console.log("=P= SAVE ==");
-    console.log(trs);
     modules.api.sql.insert({
         table: "asset_products",
         values: {
@@ -127,9 +123,6 @@ Product.prototype.onBind = function (_modules) {
 }
 
 Product.prototype.add = function (cb, query) {
-    console.log("==ADD==");
-    console.log(query);
-
     // Validate query object
     library.validator.validate(query, {
         type: "object",
@@ -168,8 +161,6 @@ Product.prototype.add = function (cb, query) {
         }, function (err, account) {
             // If error occurs, call cb with error argument
             if (err) {
-                console.log("== ERR2 ==");
-                console.log(err);
                 return cb(err);
             }
 
@@ -186,8 +177,6 @@ Product.prototype.add = function (cb, query) {
                 });
             } catch (e) {
                 // Catch error if something goes wrong
-                console.log("== ERR3 ==");
-                console.log(e);
                 return setImmediate(cb, e.toString());
             }
 
@@ -198,9 +187,6 @@ Product.prototype.add = function (cb, query) {
 }
 
 Product.prototype.list = function (cb, query) {
-        // Select from transactions table and join Products from the asset_Products table
-        console.log("==LIST CALLED==");
-
         modules.api.sql.select({
             table: "transactions",
             alias: "t",

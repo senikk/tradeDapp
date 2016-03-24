@@ -17,9 +17,6 @@ function Order(cb, _library) {
 }
 
 Order.prototype.create = function (data, trs) {
-    console.log("=O= CREATE");
-    console.log(data);
-
     trs.recipientId = data.recipientId;
     trs.amount = 1;
     trs.asset = {
@@ -47,8 +44,8 @@ Order.prototype.verify = function (trs, sender, cb, scope) {
 
 Order.prototype.getBytes = function (trs) {
     var b = Buffer.concat([
-        new Buffer(trs.asset.fullname, 'hex'),
-        new Buffer(trs.asset.addressLine1, 'hex')
+        new Buffer(trs.asset.fullname, 'utf8'),
+        new Buffer(trs.asset.addressLine1, 'utf8')
     ]);
 
     return b;
@@ -97,11 +94,10 @@ Order.prototype.undo = function (trs, sender, cb, scope) {
 }
 
 Order.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
+    var amount = trs.amount; //
+
     console.log("=O= applyUnconfirmed");
     console.log(sender);
-    console.log(trs.amount);
-
-    var amount = trs.amount; //
 
     if (sender.u_balance < amount) {
         return setImmediate(cb, "Sender doesn't have enough coins");
@@ -147,8 +143,6 @@ Order.prototype.ready = function (trs, sender, cb, scope) {
 }
 
 Order.prototype.save = function (trs, cb) {
-    console.log("=O= SAVE ==");
-    console.log(trs);
     modules.api.sql.insert({
         table: "asset_orders",
         values: {
@@ -205,9 +199,6 @@ Order.prototype.onBind = function (_modules) {
 }
 
 Order.prototype.add = function (cb, query) {
-    console.log("=O=ADD==");
-    console.log(query);
-
     // Validate query object
     library.validator.validate(query, {
         type: "object",
@@ -268,8 +259,6 @@ Order.prototype.add = function (cb, query) {
     }, function (err) {
         // If error exists, execute callback with error as first argument
         if (err) {
-            console.log("=O= ERR1 ==");
-            console.log(err);
             return cb(err[0].message);
         }
 
@@ -279,8 +268,6 @@ Order.prototype.add = function (cb, query) {
         }, function (err, account) {
             // If error occurs, call cb with error argument
             if (err) {
-                console.log("=O= ERR2 ==");
-                console.log(err);
                 return cb(err);
             }
 
@@ -321,8 +308,6 @@ Order.prototype.add = function (cb, query) {
                         });
                     } catch (e) {
                         // Catch error if something goes wrong
-                        console.log("=O= ERR3 ==");
-                        console.log(e);
                         return setImmediate(cb, e.toString());
                     }
 

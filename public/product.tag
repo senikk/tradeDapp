@@ -6,7 +6,7 @@
             <input name="title" placeholder="Title" />
             <input name="description" placeholder="Description" />
             <label>Price</label>
-            <input name="price" placeholder="Price in Lisk" />
+            <input name="price" placeholder="Ⱡ" />
             <label># items</label>
             <input name="stockQuantity" placeholder="Number of items for sale" />
         </li>
