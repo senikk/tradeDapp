@@ -6,7 +6,7 @@ var private = {}, self = null,
 var STATUS = {
 	CREATED: 0,
 	SENT: 1,
-	CANCELED: 2
+	PAIDPACK: 2
 }
 
 function Order(cb, _library) {

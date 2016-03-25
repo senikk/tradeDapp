@@ -1,6 +1,6 @@
 <app>
 	<store if={ tag == 'store'}></store>
-	<product if={ tag == 'product'}></product>
+	<addproduct if={ tag == 'product'}></addproduct>
 	<orders if={ tag == 'orders'}></orders>
 
 	<script>

@@ -214,7 +214,8 @@ Product.prototype.list = function (cb, query) {
                     title: tx.title,
                     description: tx.description,
                     price: tx.price,
-                    stockQuantity: tx.stockQuantity
+                    stockQuantity: tx.stockQuantity,
+                    sellerId: tx.senderId
                 };
 
                 return product;

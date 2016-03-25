@@ -1,6 +1,6 @@
-<products>
-  <card each={p in products} product={p}></card>
-
+<products>  
+  <product each={p in products} product={p}></product>
+          
   <script>
  		var self = this;
  		var products = [];
