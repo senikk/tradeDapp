@@ -25,6 +25,11 @@
     	"handler" : "contracts.Order.incomming"
 	},
 	{
+    	"path": "/orders/address",
+    	"method": "get",
+    	"handler" : "contracts.Order.address"		
+	},
+	{
 		"path": "/message",
 		"method": "post",
 		"handler": "system.api.message"

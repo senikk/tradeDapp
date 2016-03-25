@@ -10,8 +10,8 @@
         </section>
     </section>
 
-	<script>
- 		var self = this;
+    <script>
+        var self = this;
         this.mixin("Helper");
-	</script>
+    </script>
 </store>

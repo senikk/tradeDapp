@@ -16,11 +16,9 @@
           { statusText(opts.order.status) }
         </div>
       </div>
-      <div class="row">
-        <div if="opts.editable">
-          <button if="opts.order.status == 1" onclick={changeStatus} class="waves-effect waves-light btn">Shipped it</button>
-          <button if="opts.order.status == 1" onclick={payback} class="waves-effect waves-light btn {disabled: this.isModal}">Payback</buton>
-        </div>
+      <div if={opts.editable} class="row buttongroup">
+          <button if="opts.order.status == 1" onclick={changeStatus} class="col s12 waves-effect waves-light btn">Shipped it</button>
+          <button if="opts.order.status == 1" onclick={payback} class="col s12 waves-effect waves-light btn {disabled: this.isModal}">Payback</buton>
       </div>
     </div>
   </div>
@@ -79,14 +77,14 @@
   <ul class="collection with-header">
     <li class="collection-header"><h5>Your orders</h5></li>
     <li each={ yours } class="collection-item">
-      <orderitem order={this}></orderitem>
+      <orderitem order={this} editable={false}></orderitem>
     </li>
   </ul>
 
   <ul class="collection with-header">
     <li class="collection-header"><h5>Incomming orders</h5></li>
     <li each={ incomming } class="collection-item">
-      <orderitem order={this}></orderitem>
+      <orderitem order={this} editable={true}></orderitem>
     </li>
   </ul>
 

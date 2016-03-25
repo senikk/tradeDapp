@@ -1,22 +1,27 @@
 <address>
 	<ul class="collection with-header">
         <li class="collection-header">
-            <i class="material-icons left">perm_identity</i> Delivery address (<span class="required">* required</span>)
+            <i class="material-icons left">perm_identity</i> Delivery address
         </li>
-    	<li class="collection-item">
-            <input name="fullname" placeholder="Full name" onchange={fullnameChange}/>
-            <input name="addressLine1" placeholder="Address Line 1" onchange={addressLine1Change}/>
-            <input name="addressLine2" placeholder="Addres Line 2" onchange={addressLine2Change}/>
-            <input name="postalCode" placeholder="ZIP/Postal Code" class="col s6" onchange={postalCodeChange}/>
-            <input name="city" placeholder="City" class="col s6" onchange={cityChange}/>
-            <input name="region" placeholder="State/Province/Region" onchange={regionChange}/>
-            <input name="country" placeholder="Country" onchange={countryChange}/>
+        <li class="collection-item">
+            <button onclick={clear} class="waves-effect orange waves-light btn"><i class="material-icons left">delete</i></button>
         </li>        
+    	<li class="collection-item">
+            <input name="fullname" placeholder="Full name" onchange={fullnameChange} value={this.address.fullname}/>
+            <input name="addressLine1" placeholder="Address Line 1" onchange={addressLine1Change} value={this.address.addressLine1}/>
+            <input name="addressLine2" placeholder="Addres Line 2" onchange={addressLine2Change} value={this.address.addressLine2}/>
+            <input name="postalCode" placeholder="ZIP/Postal Code" class="col s6" onchange={postalCodeChange} value={this.address.postalCode}/>
+            <input name="city" placeholder="City" class="col s6" onchange={cityChange} value={this.address.city}/>
+            <input name="region" placeholder="State/Province/Region" onchange={regionChange} value={this.address.region}/>
+            <input name="country" placeholder="Country" onchange={countryChange} value={this.address.country}/>
+        </li>
  	</ul>
 
     <script>
         var self = this;
         this.mixin("Helper");
+
+        // changes
 
         fullnameChange() {
             this.address.fullname = this.fullname.value;
@@ -42,6 +47,25 @@
             this.address.country = this.country.value;
         }
 
+        // clear
+
+        clear() {
+            this.address = {};
+        }
+
+        // login
+
+        this.event.on("login:after", function () {
+            console.log("CALLED LOGIN:AFTER");
+            console.log(self.address);
+            if (self.login.secret && Object.keys(self.address).length == 0) {
+                self.api.get('/orders/address?secret=' + self.login.secret)
+                    .then(function (response) {
+                      self.address = response.data.response.address;
+                      self.update();
+                    });                
+            }
+        });
     </script>
 </address>
 

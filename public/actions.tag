@@ -33,6 +33,7 @@
 
     setsecret() {
       this.login.secret = this.yoursecret.value;
+      this.event.trigger("login:after"); 
     }
   </script>
 </actions>

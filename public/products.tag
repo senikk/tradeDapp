@@ -18,5 +18,9 @@
           }
         });
     });
+
+    this.event.on("login:after", function () {
+          self.update();
+    });
 	</script>
 </products>

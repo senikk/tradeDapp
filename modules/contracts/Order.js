@@ -331,14 +331,12 @@ Order.prototype.add = function (cb, query) {
 }
 
 Order.prototype.yours = function (cb, query) {
-        // Select from transactions table and join Products from the asset_Products table
         console.log("=O=YOURS CALLED==");
     
         var keypair = modules.api.crypto.keypair(query.secret);
         modules.blockchain.accounts.setAccountAndGet({
             publicKey: keypair.publicKey.toString('hex')
         }, function (err, account) {
-            // If error occurs, call cb with error argument
             if (err) {
                 return cb(err);
             }
@@ -410,14 +408,12 @@ Order.prototype.yours = function (cb, query) {
 }
 
 Order.prototype.incomming = function (cb, query) {
-        // Select from transactions table and join Products from the asset_Products table
         console.log("=O=INCOMMING CALLED==");
 
         var keypair = modules.api.crypto.keypair(query.secret);
         modules.blockchain.accounts.setAccountAndGet({
             publicKey: keypair.publicKey.toString('hex')
         }, function (err, account) {
-            // If error occurs, call cb with error argument
             if (err) {
                 return cb(err);
             }
@@ -486,6 +482,62 @@ Order.prototype.incomming = function (cb, query) {
                 })
             });
         });
+}
+
+Order.prototype.address = function (cb, query) {
+        console.log("=O=LAST ADDRESS CALLED==");
+
+        var keypair = modules.api.crypto.keypair(query.secret);
+        modules.blockchain.accounts.setAccountAndGet({
+            publicKey: keypair.publicKey.toString('hex')
+        }, function (err, account) {
+            // If error occurs, call cb with error argument
+            if (err) {
+                return cb(err);
+            }
+
+            modules.api.sql.select({
+                table: "transactions",
+                alias: "t",
+                condition: {
+                    type: self.type,
+                    senderId: account.address
+                },
+                join: [{
+                    type: 'left outer',
+                    table: 'asset_orders',
+                    alias: "o",
+                    on: {"t.id": "o.transactionId"}
+                }],
+                sort: {
+                    timestamp: -1
+                },
+                limit: 1
+            }, ['id', 'type', 'senderId', 'senderPublicKey', 'recipientId', 'amount', 'fee', 'timestamp', 'signature', 'blockId', 'token', 
+                'transactionId', 'productId', 'status', 'fullname', 'addressLine1', 'addressLine2', 'city', 'region', 'postalCode', 'country'], 
+                    function (err, transactions) {
+                        if (err) {
+                            return cb(err.toString());
+                        }
+          
+                        console.log("== RESULT ==");
+                        console.log(transactions);
+
+                        var tx = transactions[0];
+
+                        return cb(null, {
+                            address: {
+                                fullname: tx.fullname,
+                                addressLine1: tx.addressLine1,
+                                addressLine2: tx.addressLine2,
+                                city: tx.city,
+                                region: tx.region,
+                                postalCode: tx.postalCode,
+                                country: tx.country
+                            }
+                        });
+                    });
+            });
 }
 
 module.exports = Order;

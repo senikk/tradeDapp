@@ -7,7 +7,7 @@
   			<p>{opts.product.description}</p>
         </div>
         <div class="card-action">
-        	<button onclick={buy} class="waves-effect waves-light btn {disabled: this.isModal}"><i class="material-icons left">shopping_basket</i> {opts.product.price} Ⱡ</button>
+        	<button onclick={buy} class="waves-effect waves-light btn {disabled: this.isModal || this.login.secret == ''}"><i class="material-icons left">shopping_basket</i> {opts.product.price} Ⱡ</button>
         </div>
       </div>
     </div>
@@ -16,7 +16,7 @@
     <div id="modal-payment-{opts.product.id}" class="modal bottom-sheet">
         <div class="modal-content">
             <h4>Confirm payment</h4>
-            <p>I agree to pay {opts.product.price} Ⱡ for "{opts.product.title}" to seller {opts.product.sellerId} delivered to specified address. This action can not be undone.</p>
+            <p>I agree to pay <b>{opts.product.price} Ⱡ</b> for "{opts.product.title}" to seller {opts.product.sellerId} delivered to specified address. This action can not be undone.</p>
             <addressviewinline address={this.address}></addressviewline>
         </div>
         <div class="modal-footer">
@@ -31,25 +31,23 @@
 
         agreepay() {
             console.log("AGREED TO PAY");
-            console.log(opts.product.title);
-            console.log(this.address);
 
-           /*
             this.api.post('/orders/add', {
                 productId: opts.product.id,
-                secret: "senikk",
-                address: this.address
+                secret: self.login.secret,
+                address: self.address
             }).then(function(response) {
-                console.log("=O=OK==")
+                console.log("=O=OK=PAY=")
                 console.log(response.data);
             }).catch(function(response) {
-                console.log("=O=Error==");
+                console.log("=O=Error=PAY=");
                 console.log(response);
             });
-            */
         }
 
         buy() {
+            console.log("B U Y");
+            console.log(self.address);
             this.modal('#modal-payment-'+opts.product.id);
         }
     </script>
