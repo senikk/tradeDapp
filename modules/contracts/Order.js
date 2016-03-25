@@ -378,6 +378,9 @@ Order.prototype.yours = function (cb, query) {
                     var order = {
                         id: tx.transactionId,
                         status: tx.status,
+                        amount: tx.amount,
+                        recipientId: tx.recipientId,
+                        senderId: tx.senderId,
                         address: {
                             fullname: tx.fullname,
                             addressLine1: tx.addressLine1,
@@ -454,6 +457,9 @@ Order.prototype.incomming = function (cb, query) {
                     var order = {
                         id: tx.transactionId,
                         status: tx.status,
+                        amount: tx.amount,
+                        recipientId: tx.recipientId,
+                        senderId: tx.senderId,
                         address: {
                             fullname: tx.fullname,
                             addressLine1: tx.addressLine1,

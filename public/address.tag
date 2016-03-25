@@ -7,8 +7,8 @@
             <input name="fullname" placeholder="Full name" onchange={fullnameChange}/>
             <input name="addressLine1" placeholder="Address Line 1" onchange={addressLine1Change}/>
             <input name="addressLine2" placeholder="Addres Line 2" onchange={addressLine2Change}/>
-            <input class="col s6" name="postalCode" placeholder="ZIP/Postal Code" onchange={postalCodeChange}/>
-            <input class="col s6" name="city" placeholder="City" onchange={cityChange}/>
+            <input name="postalCode" placeholder="ZIP/Postal Code" class="col s6" onchange={postalCodeChange}/>
+            <input name="city" placeholder="City" class="col s6" onchange={cityChange}/>
             <input name="region" placeholder="State/Province/Region" onchange={regionChange}/>
             <input name="country" placeholder="Country" onchange={countryChange}/>
         </li>        
@@ -44,3 +44,25 @@
 
     </script>
 </address>
+
+<addressview>
+  <section>
+      <span class="title">{ opts.address.fullname }</span>
+      <p>
+        <div if="opts.address.addressLine1" class="address">{ opts.address.addressLine1 }</div>
+        <div if="opts.address.addressLine2" class="address">{ opts.address.addressLine2 }</div>
+        <div if="opts.address.city" class="address">{ opts.address.postalCode} { opts.address.city }</div>
+        <div if="opts.address.region" class="address">{ opts.address.region }</div>
+        <div if="opts.address.country" class="address">{ opts.address.country }</div>
+      </p>
+  </section>
+</addressview>
+
+<addressviewinline>
+      <span class="title">{ opts.address.fullname }</span>
+        <span if="opts.address.addressLine1">{ opts.address.addressLine1 },</span>
+        <span if="opts.address.addressLine2">{ opts.address.addressLine2 },</span>
+        <span if="opts.address.city">{ opts.address.postalCode} { opts.address.city },</span>
+        <span if="opts.address.region">{ opts.address.region },</span>
+        <span if="opts.address.country">{ opts.address.country }</span>
+</addressviewinline>

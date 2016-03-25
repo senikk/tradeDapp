@@ -7,20 +7,21 @@
   			<p>{opts.product.description}</p>
         </div>
         <div class="card-action">
-    		<button onclick={buy} class="waves-effect waves-light btn"><i class="material-icons left">shopping_basket</i> {opts.product.price} Ⱡ</button>
+        	<button onclick={buy} class="waves-effect waves-light btn {disabled: this.isModal}"><i class="material-icons left">shopping_basket</i> {opts.product.price} Ⱡ</button>
         </div>
       </div>
     </div>
 
     <!-- Modal -->
-    <div id="modal-payment-{opts.product.id}" class="modal bottom-sheet" onenter={enter}>
+    <div id="modal-payment-{opts.product.id}" class="modal bottom-sheet">
         <div class="modal-content">
             <h4>Confirm payment</h4>
-            <p>I agree to pay {opts.product.price} Ⱡ for {opts.product.title} to seller {opts.product.sellerId}. This action can not be undone.</p>
+            <p>I agree to pay {opts.product.price} Ⱡ for "{opts.product.title}" to seller {opts.product.sellerId} delivered to specified address. This action can not be undone.</p>
+            <addressviewinline address={this.address}></addressviewline>
         </div>
         <div class="modal-footer">
-            <a onclick={pay} class="modal-action modal-close waves-effect waves-light btn">Pay <i class="material-icons right">payment</i></a>
-            <a onclick={close} class="modal-action modal-close waves-effect orange waves-light btn">Cancel</a>
+            <a onclick={agreepay} class="modal-action modal-close waves-effect waves-light btn">Pay <i class="material-icons left">payment</i></a>
+            <a class="modal-action modal-close waves-effect orange waves-light btn">Cancel</a>
         </div>
     </div>
 
@@ -28,13 +29,10 @@
         var self = this;
         this.mixin("Helper");
 
-        enter() {
-            console.log("enter");
-        }
-
-        pay() {
+        agreepay() {
             console.log("AGREED TO PAY");
             console.log(opts.product.title);
+            console.log(this.address);
 
            /*
             this.api.post('/orders/add', {
@@ -52,13 +50,7 @@
         }
 
         buy() {
-            $('#modal-payment-'+opts.product.id).openModal({
-                dismissible: true,
-                opacity: .45,
-                in_duration: 250,
-                out_duration: 250,
-                complete: function () { $('.lean-overlay').remove(); }
-            });
+            this.modal('#modal-payment-'+opts.product.id);
         }
     </script>
 </product>
