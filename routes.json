@@ -30,6 +30,11 @@
     	"handler" : "contracts.Order.address"		
 	},
 	{
+    	"path": "/orders/status",
+    	"method": "put",
+    	"handler" : "contracts.OrderUpdate.status"		
+	},	
+	{
 		"path": "/message",
 		"method": "post",
 		"handler": "system.api.message"

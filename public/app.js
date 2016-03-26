@@ -18,6 +18,14 @@ var Helper = {
         }
     });
   },
+  setAddress: function (address) {
+  	Object.assign(this.address, address);
+  	this.update();
+  },
+  clearAddress: function () {
+  	for (var field in this.address) delete this.address[field];
+  	this.update();
+  },
   address: {},
   login: {},
   isModal: false

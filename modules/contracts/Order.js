@@ -17,8 +17,6 @@ function Order(cb, _library) {
 }
 
 Order.prototype.create = function (data, trs) {
-    console.log("== CREATE ==");
-    console.log(data);
     trs.recipientId = data.recipientId;
     trs.amount = data.amount;
     trs.asset = {
@@ -98,8 +96,7 @@ Order.prototype.undo = function (trs, sender, cb, scope) {
 Order.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
     var amount = trs.amount; //
 
-    console.log("=O= applyUnconfirmed");
-    console.log(sender);
+    console.log("<3O applyUnconfirmed = " + JSON.stringify(sender));
 
     if (sender.u_balance < amount) {
         return setImmediate(cb, "Sender doesn't have enough coins");
@@ -201,7 +198,6 @@ Order.prototype.onBind = function (_modules) {
 }
 
 Order.prototype.add = function (cb, query) {
-    // Validate query object
     library.validator.validate(query, {
         type: "object",
         properties: {
@@ -293,9 +289,6 @@ Order.prototype.add = function (cb, query) {
                     return cb(err? err.toString() : "Can't find product");
                 }
 
-                console.log("== ROW ==");
-                console.log(rows[0]);
-
                 modules.blockchain.accounts.getAccount({
                     publicKey: rows[0].senderPublicKey
                 }, function (err, recipient) {
@@ -331,7 +324,7 @@ Order.prototype.add = function (cb, query) {
 }
 
 Order.prototype.yours = function (cb, query) {
-        console.log("=O=YOURS CALLED==");
+        console.log("<3O YOURS CALLED = " + JSON.stringify(query));
     
         var keypair = modules.api.crypto.keypair(query.secret);
         modules.blockchain.accounts.setAccountAndGet({
@@ -408,7 +401,7 @@ Order.prototype.yours = function (cb, query) {
 }
 
 Order.prototype.incomming = function (cb, query) {
-        console.log("=O=INCOMMING CALLED==");
+        console.log("<3O INCOMMING CALLED = " + JSON.stringify(query));
 
         var keypair = modules.api.crypto.keypair(query.secret);
         modules.blockchain.accounts.setAccountAndGet({
@@ -485,7 +478,7 @@ Order.prototype.incomming = function (cb, query) {
 }
 
 Order.prototype.address = function (cb, query) {
-        console.log("=O=LAST ADDRESS CALLED==");
+        console.log("<3O LAST ADDRESS CALLED = " + JSON.stringify(query));
 
         var keypair = modules.api.crypto.keypair(query.secret);
         modules.blockchain.accounts.setAccountAndGet({
@@ -520,9 +513,6 @@ Order.prototype.address = function (cb, query) {
                             return cb(err.toString());
                         }
           
-                        console.log("== RESULT ==");
-                        console.log(transactions);
-
                         var tx = transactions[0];
 
                         return cb(null, {

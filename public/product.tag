@@ -31,6 +31,7 @@
 
         agreepay() {
             console.log("AGREED TO PAY");
+            console.log(self.login.secret);
 
             this.api.post('/orders/add', {
                 productId: opts.product.id,
@@ -46,8 +47,6 @@
         }
 
         buy() {
-            console.log("B U Y");
-            console.log(self.address);
             this.modal('#modal-payment-'+opts.product.id);
         }
     </script>

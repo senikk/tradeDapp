@@ -31,5 +31,6 @@
     "contracts/withdrawaltransfer": "./modules/contracts/withdrawaltransfer.js",
     "contracts/token": "./modules/contracts/token.js",
     "contracts/Product": "./modules/contracts/Product.js",
-    "contracts/Order": "./modules/contracts/Order.js"
+    "contracts/Order": "./modules/contracts/Order.js",
+    "contracts/OrderUpdate": "./modules/contracts/OrderUpdate.js"
 }

@@ -13,5 +13,6 @@
     <script>
         var self = this;
         this.mixin("Helper");
+
     </script>
 </store>

@@ -52,9 +52,8 @@ Product.prototype.undo = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.applyUnconfirmed = function (trs, sender, cb, scope) {
-    console.log("=P= APPLY UNCONFIRMED ==");
-    console.log(trs);
-
+    console.log("<3P APPLY UNCONFIRMED = " + JSON.stringify(trs));
+  
     if (sender.u_balance < trs.fee) {
         return setImmediate(cb, "Sender doesn't have enough coins");
     }
@@ -77,6 +76,7 @@ Product.prototype.ready = function (trs, sender, cb, scope) {
 }
 
 Product.prototype.save = function (trs, cb) {
+    console.log("<3P SAVE = " + JSON.stringify(trs));
     modules.api.sql.insert({
         table: "asset_products",
         values: {
@@ -150,8 +150,7 @@ Product.prototype.add = function (cb, query) {
     }, function (err) {
         // If error exists, execute callback with error as first argument
         if (err) {
-            console.log("== ERR1 ==");
-            console.log(err);
+            console.log("<3P= ERR1 = " + err);
             return cb(err[0].message);
         }
 
@@ -176,6 +175,7 @@ Product.prototype.add = function (cb, query) {
                     keypair: keypair
                 });
             } catch (e) {
+                console.log("<3P transaction error = " + e.toString());
                 // Catch error if something goes wrong
                 return setImmediate(cb, e.toString());
             }

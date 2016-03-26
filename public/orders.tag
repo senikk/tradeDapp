@@ -17,8 +17,8 @@
         </div>
       </div>
       <div if={opts.editable} class="row buttongroup">
-          <button if="opts.order.status == 1" onclick={changeStatus} class="col s12 waves-effect waves-light btn">Shipped it</button>
-          <button if="opts.order.status == 1" onclick={payback} class="col s12 waves-effect waves-light btn {disabled: this.isModal}">Payback</buton>
+          <button if={opts.order.status == 0} onclick={shipit} class="col s12 waves-effect waves-light btn">Shipped it</button>
+          <button if={opts.order.status == 0} onclick={payback} class="col s12 waves-effect waves-light btn {disabled: this.isModal}">Payback</buton>
       </div>
     </div>
   </div>
@@ -36,6 +36,7 @@
   </div>
 
   <script>
+    var self = this;
     this.mixin("Helper");
 
     var STATUS = [
@@ -49,24 +50,32 @@
     }
 
     changeStatus(id, status) {
+      console.log("CHANGE STATUS TO " + status + " for " + id);
+
       this.api.put('/orders/status', {
+        orderId: id,
         status: status,
         secret: this.login.secret
       }).then(function (response) {
           if (response.data.success) {
+            console.log("ORDER CHANGED STATUS");
+            console.log(response.data);
+            opts.order.status = status;
             self.update();
           }
         });
     }
 
-    agreepayback() {
+    shipit() {
+      this.changeStatus(opts.order.id, 1);
+    }
 
+    agreepayback() {
+      this.changeStatus(opts.order.id, 2); // TODO make a confirm box before sending money back
     }
 
     payback() {
-      this.modal('#modal-payback-'+opts.order.id);
-     
-      //this.changeStatus(id, 2); // TODO make a confirm box before sending money back
+      this.modal('#modal-payback-'+opts.order.id);     
     }
   </script>
 </orderitem>
@@ -74,18 +83,22 @@
 <orders>
   <actions title="Orders"></actions>
 
-  <ul class="collection with-header">
+  <ul if={incomming.length > 0} class="collection with-header">
+    <li class="collection-header"><h5>Incomming orders</h5></li>
+    <li each={ incomming } class="collection-item">
+      <orderitem order={this} editable={true}></orderitem>
+    </li>
+  </ul>
+
+  <ul if={yours.length > 0} class="collection with-header">
     <li class="collection-header"><h5>Your orders</h5></li>
     <li each={ yours } class="collection-item">
       <orderitem order={this} editable={false}></orderitem>
     </li>
   </ul>
 
-  <ul class="collection with-header">
-    <li class="collection-header"><h5>Incomming orders</h5></li>
-    <li each={ incomming } class="collection-item">
-      <orderitem order={this} editable={true}></orderitem>
-    </li>
+  <ul if={yours.length == 0 && incomming.length == 0} class="collection with-header">
+    <li class="collection-header">No orders</li>
   </ul>
 
   <script>
@@ -95,7 +108,15 @@
     this.mixin("Helper");
 
     this.on("before-mount", function () {
-      this.api.get('/orders/yours?secret=senikk2')
+      this.fetch();
+    });
+
+    this.event.on("login:after", function () {
+      self.fetch();
+    });
+
+    fetch() {
+      this.api.get('/orders/yours?secret=' + this.login.secret)
         .then(function (response) {
           if (response.data.success) {
             self.yours = response.data.response.orders;
@@ -104,14 +125,14 @@
           }
         });
 
-      this.api.get('/orders/incomming?secret=senikk2')
+      this.api.get('/orders/incomming?secret=' + this.login.secret)
         .then(function (response) {
           if (response.data.success) {
             self.incomming = response.data.response.orders;
             console.log(self.incomming);
             self.update();
           }
-        });
-    });
+        });      
+    }
 	</script>
 </orders>

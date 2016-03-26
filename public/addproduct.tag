@@ -20,13 +20,16 @@
         this.mixin("Helper");
         self.stockQuantity.value = 1;
 
-        add(e) {
+        add() {
+            console.log("ADDING");
+            console.log(self.login.secret);
+
             this.api.post('/products/add', {
                 title: self.title.value,
                 description: self.description.value,
                 price: parseInt(self.price.value),
                 stockQuantity: parseInt(self.stockQuantity.value),
-                secret: "senikk"
+                secret: self.login.secret
             }).then(function(response) {
                 console.log("==OK==")
                 console.log(response.data);

@@ -4,7 +4,7 @@
       <h5 onclick={home}><i class="material-icons left medium">store</i></h5>
     </div>
     <div class="col s8 right-align" style="padding-top: 10px;">
-      <input type="text" name="yoursecret" class="s4" placeholder="Enter your secret" onchange={setsecret} />
+      <input type="text" name="yoursecret" class="s4" placeholder="Enter your secret" onchange={setsecret} value={this.login.secret} />
     </div>
     <div class="col s3 right-align" style="padding-top: 10px;">
       <a class="btn-floating btn-large" onclick={search}>

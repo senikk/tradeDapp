@@ -1,10 +1,10 @@
 <address>
 	<ul class="collection with-header">
         <li class="collection-header">
-            <i class="material-icons left">perm_identity</i> Delivery address
+            <i class="material-icons left">perm_identity</i> Shipping address
+            <span onclick={clear} class=""><i class="material-icons right">delete</i></span>
         </li>
         <li class="collection-item">
-            <button onclick={clear} class="waves-effect orange waves-light btn"><i class="material-icons left">delete</i></button>
         </li>        
     	<li class="collection-item">
             <input name="fullname" placeholder="Full name" onchange={fullnameChange} value={this.address.fullname}/>
@@ -50,22 +50,8 @@
         // clear
 
         clear() {
-            this.address = {};
+            self.clearAddress();
         }
-
-        // login
-
-        this.event.on("login:after", function () {
-            console.log("CALLED LOGIN:AFTER");
-            console.log(self.address);
-            if (self.login.secret && Object.keys(self.address).length == 0) {
-                self.api.get('/orders/address?secret=' + self.login.secret)
-                    .then(function (response) {
-                      self.address = response.data.response.address;
-                      self.update();
-                    });                
-            }
-        });
     </script>
 </address>
 
