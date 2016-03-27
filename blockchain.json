@@ -229,6 +229,14 @@
 				"on": {
 					"t.id": "o.transactionId"
 				}
+			},
+			{
+				"type": "left outer",
+				"table": "asset_orders",
+				"alias": "ou",
+				"on": {
+					"t.recipientId": "ou.transactionId"
+				}
 			}
 		]
 	},

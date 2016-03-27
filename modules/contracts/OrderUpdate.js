@@ -10,10 +10,9 @@ function OrderUpdate(cb, _library) {
 
 OrderUpdate.prototype.create = function (data, trs) {
 	console.log("<3OU CREATE = " + JSON.stringify(data));
-
 	trs.recipientId = data.recipientId;
 	trs.asset = {
-        orderId: data.orderId,
+		orderId: data.recipientId,
         status: data.status
     };
 
@@ -31,7 +30,7 @@ OrderUpdate.prototype.verify = function (trs, sender, cb, scope) {
 OrderUpdate.prototype.getBytes = function (trs) {
 	console.log("<3OU getBytes = " + JSON.stringify(trs));
       
-    return new Buffer(trs.asset.orderId, 'utf8');
+    return new Buffer(trs.recipientId, 'utf8');
 }
 
 OrderUpdate.prototype.apply = function (trs, sender, cb, scope) {
@@ -81,17 +80,18 @@ OrderUpdate.prototype.save = function (trs, cb) {
 OrderUpdate.prototype.dbRead = function (row) {
 	console.log("<3OU READ = " + JSON.stringify(row));
 
-    if (!row.o_transactionId) {
+    if (!row.t_transactionId) {
         return null;
     } else {
         return {
-            orderId: row.o_transactionId,
-            status: row.o_status
+	    	orderId: row.t_recipientId,
+	        status: row.ou_status        		
         };
     }
 }
 
 OrderUpdate.prototype.normalize = function (asset, cb) {
+	console.log("<3OU normalize = " + JSON.stringify(asset));
     library.validator.validate(asset, {
         type: "object",
         properties: {
@@ -111,7 +111,6 @@ OrderUpdate.prototype.onBind = function (_modules) {
 }
 
 OrderUpdate.prototype.status = function (cb, query) {
-	console.log("=$OU STATUS = " + JSON.stringify(query));
     library.validator.validate(query, {
         type: "object",
         properties: {
@@ -146,17 +145,14 @@ OrderUpdate.prototype.status = function (cb, query) {
             try {
                 var transaction = library.modules.logic.transaction.create({
                     type: self.type,
-                    orderId: query.orderId,
                     status: query.status,
-                    recipientId: query.orderId,
                     sender: account,
-                    keypair: keypair
+                    keypair: keypair,
+                    recipientId: query.orderId      
                 });
             } catch (e) {
                 return setImmediate(cb, e.toString());
             }
-
-            console.log("<3OU BEFORE TRANSACTION");
 
             modules.blockchain.transactions.processUnconfirmedTransaction(transaction, cb);
         });
